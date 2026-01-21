@@ -1,6 +1,6 @@
 # Node.js Advanced Uptime Monitor
 
-This project is a robust Node.js application that regularly checks the status (UP/DOWN) of your websites, utilizes a queue-based architecture, and sends instant notifications via Telegram in case of downtime.
+This project is a Node.js application that regularly checks the status (UP/DOWN) of your websites, utilizes a queue-based architecture, and sends instant notifications via Telegram in case of downtime.
 
 ## 🚀 Features
 
@@ -17,7 +17,10 @@ This project is a robust Node.js application that regularly checks the status (U
 
 ```bash
 npm install
+npm run setup
 ```
+
+This command will automatically create `config.json` and `.env` files from examples.
 
 ## ⚙️ Configuration
 
@@ -48,12 +51,22 @@ Specify the websites to monitor in the `config.json` file:
       "name": "My Portfolio",
       "url": "https://ibrahimkaya.dev"
     }
-  ]
+  ],
+  "templates": {
+    "down": "🔴 **DOWN ALERT**\n\nWebsite: {{name}} ({{url}})\nStatus: **DOWN**\nError: {{error}}\nTime: {{time}}",
+    "up": "✅ **RECOVERY ALERT**\n\nWebsite: {{name}} ({{url}})\nStatus: **UP**\nDowntime: {{downtime}}"
+  }
 }
 ```
 
 *   `checkIntervalSeconds`: Determines how often (in seconds) the check loop runs.
 *   `websites`: The list of websites to be monitored.
+*   `templates`: Custom Telegram notification messages. Supported placeholders:
+    *   `{{name}}`: Website name
+    *   `{{url}}`: Website URL
+    *   `{{error}}`: Error message (only for 'down')
+    *   `{{time}}`: Current time (only for 'down')
+    *   `{{downtime}}`: Duration of downtime (only for 'up')
 
 ## ▶️ Usage
 

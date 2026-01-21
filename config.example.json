@@ -2,12 +2,12 @@
     "checkIntervalSeconds": 60,
     "websites": [
         {
-            "name": "Ibrahim Kaya Portfolyo",
+            "name": "My Portfolio",
             "url": "https://ibrahimkaya.dev"
         },
         {
-            "name": "GameAstro.org",
-            "url": "https://gameastro.org"
+            "name": "Google",
+            "url": "https://www.google.com"
         }
     ],
     "templates": {

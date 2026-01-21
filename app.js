@@ -25,6 +25,38 @@ try {
     process.exit(1);
 }
 
+// Helper: Format Duration
+const formatDuration = (ms) => {
+    const seconds = Math.floor((ms / 1000) % 60);
+    const minutes = Math.floor((ms / (1000 * 60)) % 60);
+    const hours = Math.floor((ms / (1000 * 60 * 60)));
+
+    if (hours > 0) {
+        return `${hours} hours ${minutes} minutes ${seconds} seconds`;
+    } else {
+        return `${minutes} minutes ${seconds} seconds`;
+    }
+};
+
+// Helper: Get Message from Template
+const getMessage = (type, data) => {
+    const templates = config.templates || {};
+    let template = templates[type];
+
+    // Default templates if missing
+    if (!template) {
+        if (type === 'down') template = "🔴 **DOWN ALERT**\n\nWebsite: {{name}} ({{url}})\nStatus: **DOWN**\nError: {{error}}\nTime: {{time}}";
+        if (type === 'up') template = "✅ **RECOVERY ALERT**\n\nWebsite: {{name}} ({{url}})\nStatus: **UP**\nDowntime: {{downtime}}";
+    }
+
+    return template
+        .replace('{{name}}', data.name)
+        .replace('{{url}}', data.url)
+        .replace('{{error}}', data.error || '')
+        .replace('{{time}}', data.time || '')
+        .replace('{{downtime}}', data.downtime || '');
+};
+
 // State tracking
 const siteStates = {}; // { url: { isDown: boolean, downSince: Date, lastError: string } }
 
@@ -49,15 +81,21 @@ const checkWorker = async (website) => {
 
         // If site was down, it is now recovered
         if (state.isDown) {
-            const downTimeDuration = ((Date.now() - state.downSince) / 1000).toFixed(1);
-            const message = `✅ **RECOVERY ALERT**\n\nWebsite: ${name} (${url})\nStatus: **UP**\nDowntime: ${downTimeDuration}s`;
+            const downtimeMs = Date.now() - state.downSince;
+            const formattedDowntime = formatDuration(downtimeMs);
+
+            const message = getMessage('up', {
+                name,
+                url,
+                downtime: formattedDowntime
+            });
 
             queueService.addToNotificationQueue({ message });
 
             state.isDown = false;
             state.downSince = null;
             state.lastError = null;
-            console.log(`[${new Date().toISOString()}] ${name} is BACK UP. Downtime: ${downTimeDuration}s`);
+            console.log(`[${new Date().toISOString()}] ${name} is BACK UP. Downtime: ${formattedDowntime}`);
         } else {
             console.log(`[${new Date().toISOString()}] ${name} is UP (${duration}ms)`);
         }
@@ -71,7 +109,12 @@ const checkWorker = async (website) => {
             state.downSince = Date.now();
             state.lastError = errorMsg;
 
-            const message = `🔴 **DOWN ALERT**\n\nWebsite: ${name} (${url})\nStatus: **DOWN**\nError: ${errorMsg}\nTime: ${new Date().toLocaleString()}`;
+            const message = getMessage('down', {
+                name,
+                url,
+                error: errorMsg,
+                time: new Date().toLocaleString()
+            });
 
             queueService.addToNotificationQueue({ message });
 
