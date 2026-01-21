@@ -1,0 +1,13 @@
+{
+    "checkIntervalSeconds": 60,
+    "websites": [
+        {
+            "name": "Ibrahim Kaya Portfolyo",
+            "url": "https://ibrahimkaya.dev"
+        },
+        {
+            "name": "GameAstro.org",
+            "url": "https://gameastro.org"
+        }
+    ]
+}
