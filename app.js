@@ -130,10 +130,6 @@ const notificationWorker = async (task) => {
     await telegramService.sendTelegramMessage(task.message);
 };
 
-// Initialize Services
-telegramService.initTelegram(process.env.TELEGRAM_BOT_TOKEN, process.env.TELEGRAM_CHAT_ID);
-queueService.initQueues(checkWorker, notificationWorker, 5); // 5 concurrent checks
-
 // Schedule Checks
 const startMonitoring = () => {
     const intervalSeconds = config.checkIntervalSeconds || 60;
@@ -151,9 +147,6 @@ const startMonitoring = () => {
     const shutdown = () => {
         console.log('Shutting down...');
         clearInterval(intervalId);
-        // Process would exit naturally after queues drain, or we can force it if needed.
-        // For now, let's just log and let node exit when event loop is empty if possible, 
-        // but interval keeps it open. ClearInterval allows exit if no pending tasks.
         process.exit(0);
     };
 
@@ -161,4 +154,13 @@ const startMonitoring = () => {
     process.on('SIGTERM', shutdown);
 };
 
-startMonitoring();
+// Initialize and Start
+const startApp = async () => {
+    // Initialize Services
+    await telegramService.initTelegram(process.env.TELEGRAM_BOT_TOKEN, process.env.TELEGRAM_CHAT_ID);
+    queueService.initQueues(checkWorker, notificationWorker, 5); // 5 concurrent checks
+
+    startMonitoring();
+};
+
+startApp();

@@ -3,14 +3,22 @@ const TelegramBot = require('node-telegram-bot-api');
 let bot;
 let groupChatId;
 
-const initTelegram = (token, chatId) => {
+const initTelegram = async (token, chatId) => {
     if (!token || !chatId) {
         console.warn('Telegram token or chat ID missing. Notifications will be disabled.');
         return;
     }
     bot = new TelegramBot(token, { polling: false });
     groupChatId = chatId;
-    console.log('Telegram service initialized');
+
+    try {
+        const me = await bot.getMe();
+        const chat = await bot.getChat(groupChatId);
+        const chatName = chat.title || chat.first_name || 'Unknown Chat';
+        console.log(`Telegram service initialized.\nBot: ${me.first_name} (@${me.username})\nChat: ${chatName} (ID: ${groupChatId})`);
+    } catch (error) {
+        console.error('Failed to connect to Telegram:', error.message);
+    }
 };
 
 const sendTelegramMessage = async (message) => {
