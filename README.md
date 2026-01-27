@@ -60,6 +60,7 @@ Specify the websites to monitor in the `config.json` file:
 ```
 
 *   `checkIntervalSeconds`: Determines how often (in seconds) the check loop runs.
+*   `requestTimeout`: Timeout for HTTP requests in milliseconds (default: 10000).
 *   `websites`: The list of websites to be monitored.
 *   `templates`: Custom Telegram notification messages. Supported placeholders:
     *   `{{name}}`: Website name

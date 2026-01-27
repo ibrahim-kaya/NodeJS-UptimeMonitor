@@ -1,5 +1,6 @@
 {
     "checkIntervalSeconds": 60,
+    "requestTimeout": 10000,
     "websites": [
         {
             "name": "My Portfolio",

@@ -74,7 +74,7 @@ const checkWorker = async (website) => {
     try {
         const start = Date.now();
         await axios.get(url, {
-            timeout: 10000, // 10 seconds timeout
+            timeout: config.requestTimeout || 10000,
             validateStatus: (status) => status >= 200 && status < 300 // Only 2xx is considered UP
         });
         const duration = Date.now() - start;
